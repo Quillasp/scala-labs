@@ -18,6 +18,7 @@ class TokenizerService(spellCheckerSvc: SpellCheckerService):
 
     var output: Array[(String, Token)] = splitted.map(w => {
       val word:String = if spellCheckerSvc.dictionary.contains(w) then spellCheckerSvc.dictionary.get(w).orNull else spellCheckerSvc.getClosestWordInDictionary(w)
+      println(word)
       val token:Token = selectToken(word)
       (word, token)
     })
@@ -27,7 +28,7 @@ class TokenizerService(spellCheckerSvc: SpellCheckerService):
   def selectToken(word:String):Token = {
     word match {
       case "bonjour" => Token.BONJOUR
-      case "je " => Token.JE
+      case "je" => Token.JE
       case "etre" => Token.ETRE
       case "vouloir" => Token.VOULOIR
       case "assoiffe" => Token.ASSOIFFE

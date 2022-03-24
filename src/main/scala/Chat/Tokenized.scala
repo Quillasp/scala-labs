@@ -17,7 +17,7 @@ class TokenizedImpl(val tokens: Array[(String, Token)]) extends Tokenized:
   var index:Int = -1
   def nextToken(): (String, Token) = {
     index += 1
-    if index > tokens.length
+    if index >= tokens.length
     then ("EOL", Token.EOL)
     else tokens(index)
   }
