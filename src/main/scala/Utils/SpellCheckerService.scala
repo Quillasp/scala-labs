@@ -31,31 +31,58 @@ class SpellCheckerImpl(val dictionary: Map[String, String]) extends SpellChecker
   def stringDistance(s1: String, s2: String): Int =
     /* Used for memoization, because if not, with a functional implementation of the Levenshtein distance there would be
      * a massive number of calls depending on the string length (i.e. for 2 words of length 6, there would be 13483
-     * calls). So we store the the input of the function helper as the key and its output as the value.
+     * calls). So we store the input of the function helper as the key and its output as the value.
      */
+    if s1.isEmpty then return s2.length
+    if s2.isEmpty then return s1.length
     val memoizedCosts = mutable.Map[(List[Char],List[Char]),Int]()
-
+    // We store the words reversed, because we will add each letter to the front of lists
+    val words = (s1.reverse.toVector, s2.reverse.toVector)
     // function helper to compute the Levenshtein distance between 2 lists of chars
-    def sd(s1: List[Char], s2: List[Char]): Int =
-      // We check if the function has already computed the costs, if not
-      if !memoizedCosts.contains((s1, s2)) then
-      // We recursively create the memoization
-        memoizedCosts((s1,s2)) = (s1, s2) match {
-          case (_, Nil) => s1.length
-          case (Nil, _) => s2.length
-          /* If both strings are not empty, we take the head and tail of both and then compute the distance following
-           * the rules
-           * TODO finish documentation of the stringDistance method
-           */
-          case (c1::t1, c2::t2)  => List( sd(t1, s2) + 1,
-                                          sd(s1, t2) + 1,
-                                          sd(t1, t2) + (if(c1==c2) 0 else 1)).min
-        }
+    def sd(l1: List[Char], l2: List[Char]): Int =
+      // We compute the Levenshtein distance of current words, based on already computed distances
+      var value = -1
+      if l1.isEmpty then
+        // Base case
+        value = l2.size
+      else if l2.isEmpty then
+        // Base case
+        value = l1.size
+      else
+        val (h1::t1) = l1
+        val (h2::t2) = l2
+        // Is the first letter of the words the same ? (remember we construct them in reverse order)
+        val sameLetter = if (h1 == h2) then 0 else 1
+        // Compute the minimum
+        value = List(
+          memoizedCosts((t1, l2)) + 1,
+          memoizedCosts((l1, t2)) + 1,
+          memoizedCosts((t1, t2)) + sameLetter,
+        ).min
       end if
-      // If it's already there, we simply return it
-      memoizedCosts((s1,s2))
+      // Set the new value
+      memoizedCosts((l1,l2)) = value
+      // Is it the end ?
+      if l1.length == words._1.length &&  l2.length == words._2.length then
+        memoizedCosts.getOrElse((l1, l2), -1)
+      else
+        // Depending on the case, only l1 or l2 need to be changed
+        var n_l1:List[Char] = List() // next l1 value if l2 need to be changed
+        var n_l2:List[Char] = l2 // next l2 value if l1 need to be changed
+        // We complete the table column by column, we check what's the next value we need to compute
+        if l1.length >= words._1.length then
+          // Add next letter to n_l2, n_l1 is already empty
+          n_l2 = words._2(l2.length)::l2
+        else
+          // Add next letter to n_l1, n_l2 is still l2
+          n_l1 = words._1(l1.length)::l1
+        end if
+        // Tail recursive call for next computation
+        sd(n_l1, n_l2)
+      end if
 
-    sd(s1.toList, s2.toList)
+    // Base call : two empty words
+    sd(Nil, Nil)
 
 
 

@@ -2,7 +2,7 @@ package Chat
 
 enum Token:
   case // Terms
-       BONJOUR, 
+       BONJOUR,
        JE,
        SVP,
        ASSOIFFE,
