@@ -11,14 +11,17 @@ class TokenizerService(spellCheckerSvc: SpellCheckerService):
     */
   // TODO - Part 1 Step 3
   def tokenize(input: String): Tokenized = {
-    val transformed = input.replaceAll("[.,!?*]+", "")
+    val transformed = input.replaceAll("[.,!?*]+", "") // Remove special characters
       .replaceAll("[' ]+", " ")
       .trim()
-    val splitted = transformed.split(" ")
+    val splitted = transformed.split(" ") // Split into separated words
 
     var output: Array[(String, Token)] = splitted.map(w => {
-      val word:String = if spellCheckerSvc.dictionary.contains(w) then spellCheckerSvc.dictionary.get(w).orNull else spellCheckerSvc.getClosestWordInDictionary(w)
-      println(word)
+      // Get the closest word from dictionnary
+      val word:String = if spellCheckerSvc.dictionary.contains(w)
+          then spellCheckerSvc.dictionary.get(w).orNull
+          else spellCheckerSvc.getClosestWordInDictionary(w)
+      // Get the right token for the word
       val token:Token = selectToken(word)
       (word, token)
     })
