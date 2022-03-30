@@ -76,7 +76,7 @@ class SpellCheckerImpl(val dictionary: Map[String, String]) extends SpellChecker
           n_l1 = List()
           n_l2 = words._2(l2.length)::l2
         else
-          // We had another letter to l1
+          // We add another letter to l1
           n_l1 = words._1(l1.length)::l1
           n_l2 = l2
         end if
