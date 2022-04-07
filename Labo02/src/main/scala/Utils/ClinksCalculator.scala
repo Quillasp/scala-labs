@@ -1,5 +1,7 @@
 package Utils
 
+import scala.annotation.tailrec
+
 /**
   * Contains the function necessary to calculate the number of *clinks* when n people want to cheers.
   */
@@ -11,13 +13,16 @@ object ClinksCalculator:
     */
   // TODO - Part 1 Step 1
   def factorial(n: Int): BigInt =
-    def factAcc(acc: Int, n: Int): Int =
+    @tailrec
+    def factAcc(acc: Int, n: Int): BigInt =
       if (n == 1 || n == 0)
         acc
       else
         factAcc(acc * n, n - 1)
 
-    factAcc(1, n)
+    if n < 0
+    then throw new Exception("n should be non-negative")
+    else factAcc(1, n)
 
   /**
     * Calculate the combination of two given numbers
@@ -27,5 +32,6 @@ object ClinksCalculator:
     */
   // TODO - Part 1 Step 1
   def calculateCombination(n: Int, k: Int): Int =
-    (factorial(n) / (factorial(k) * factorial(n - k))).toInt
+    if k > n then 0
+    else (factorial(n) / (factorial(k) * factorial(n - k))).toInt
 end ClinksCalculator
