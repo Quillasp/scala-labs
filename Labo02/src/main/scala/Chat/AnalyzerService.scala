@@ -25,4 +25,14 @@ class AnalyzerService(productSvc: ProductService,
       // Example cases
       case Thirsty() => "Eh bien, la chance est de votre côté, car nous offrons les meilleures bières de la région !"
       case Hungry() => "Pas de soucis, nous pouvons notamment vous offrir des croissants faits maisons !"
+      case Pseudo(name) => {
+        session.setCurrentUser(name)
+        accountSvc.addAccount(name, 30.0)
+        s"Bienvenue à vous, $name"
+      }
+      case Balance() => {
+        val currentUser:String = (session.getCurrentUser).getOrElse("")
+        val balance:Double = accountSvc.getAccountBalance(currentUser)
+        if !balance.isNaN then s"Vous avez ${String.valueOf(balance)} CHF" else "Vous n'avez pas de compte"
+      }
 end AnalyzerService

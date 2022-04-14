@@ -18,9 +18,7 @@ class TokenizerService(spellCheckerSvc: SpellCheckerService):
 
     var output: Array[(String, Token)] = splitted.map(w => {
       // Get the closest word from dictionnary
-      val word:String = if spellCheckerSvc.dictionary.contains(w)
-          then spellCheckerSvc.dictionary.get(w).orNull
-          else spellCheckerSvc.getClosestWordInDictionary(w)
+      val word:String = spellCheckerSvc.dictionary.getOrElse(w, spellCheckerSvc.getClosestWordInDictionary(w))
       // Get the right token for the word
       val token:Token = selectToken(word)
       (word, token)

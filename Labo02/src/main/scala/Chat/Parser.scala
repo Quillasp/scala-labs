@@ -35,12 +35,22 @@ class Parser(tokenized: Tokenized):
     if curToken == BONJOUR then readToken()
     if curToken == JE then
       readToken()
-      eat(ETRE)
-      if curToken == ASSOIFFE then
-        readToken()
-        Thirsty()
-      else if curToken == AFFAME then
-        readToken()
-        Hungry()
-      else expected(ASSOIFFE, AFFAME)
+      if curToken == ETRE then
+        eat(ETRE)
+        if curToken == ASSOIFFE then
+          readToken()
+          Thirsty()
+        else if curToken == AFFAME then
+          readToken()
+          Hungry()
+        else if curToken == PSEUDO then
+          val p = curValue.substring(1)
+          readToken()
+          Pseudo(p)
+        else expected(ASSOIFFE, AFFAME, PSEUDO)
+      else if curToken == VOULOIR then
+        eat(VOULOIR)
+        eat(SOLDE)
+        Balance()
+      else expected(ETRE, VOULOIR)
     else expected(BONJOUR, JE)

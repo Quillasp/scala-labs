@@ -13,3 +13,5 @@ object ExprTree:
   // Example cases
   case class Thirsty() extends ExprTree
   case class Hungry() extends ExprTree
+  case class Pseudo(name:String) extends ExprTree
+  case class Balance() extends ExprTree
