@@ -95,14 +95,12 @@ class SpellCheckerImpl(val dictionary: Map[String, String]) extends SpellChecker
       // If the string start with a digit or with an underscore, we just return it
       case s if s(0) == '_' || s(0).isDigit => misspelledWord
       // If not we compute the distance with each key and take the min and return the associated value
-      case s => dictionary.get(
+      case s => dictionary.getOrElse(
         dictionary
         .keySet // Getting a set of all keys
         .toList // Cast to List
         .map(w => (w, stringDistance(w, misspelledWord))) // Create a tuple with (word, distance)
         .minBy(t => t._2) // Getting the min with the distance as the ordering parameter
-        ._1) match {
-        case Some(s) => s // The Map's get method return an Option, so we return the value that's in it
-      }
+        ._1, "missing term")
     }
 end SpellCheckerImpl
