@@ -15,3 +15,7 @@ object ExprTree:
   case class Hungry() extends ExprTree
   case class Pseudo(name:String) extends ExprTree
   case class Balance() extends ExprTree
+  case class Order(nb:Int, productType: String, brandName: String) extends ExprTree
+  case class AskPrice(order: ExprTree) extends ExprTree
+  case class And(t1:ExprTree, t2:ExprTree) extends ExprTree
+  case class Or(t1:ExprTree, t2:ExprTree) extends ExprTree

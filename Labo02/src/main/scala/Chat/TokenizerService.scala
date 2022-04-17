@@ -55,7 +55,7 @@ class TokenizerService(spellCheckerSvc: SpellCheckerService):
       case "quel" => Token.QUEL
       case "combien" => Token.COMBIEN
       
-      case "coute" => Token.COUT
+      case "coute" => Token.COUTE
       case "solde" => Token.SOLDE
       case "prix" => Token.PRIX
       

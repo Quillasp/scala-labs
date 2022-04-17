@@ -4,15 +4,15 @@ enum Token:
   case // Terms
        BONJOUR,
        JE,
-  ME,
-  DE,
-  LE,
+      ME,
+      DE,
+      LE,
        SVP,
        ASSOIFFE,
        AFFAME,
   // Price
   PRIX,
-  COUT,
+  COUTE,
   SOLDE,
   // Question
   COMBIEN,
@@ -30,7 +30,7 @@ enum Token:
        OU,
        // Products
        PRODUCT,
-  PRODUCTS,
+       PRODUCTS,
        MARQUE,
        // Util
        ETATAME,

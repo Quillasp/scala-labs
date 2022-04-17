@@ -24,6 +24,8 @@ object Dictionary:
     "aimerais" -> "vouloir",
     "commander" -> "commander",
     "connaitre" -> "connaitre",
+    "savoir" -> "connaitre",
+    "combien" -> "combien",
     "coûte" -> "coute",
     "coûtent" -> "coute",
     "quel" -> "quel",

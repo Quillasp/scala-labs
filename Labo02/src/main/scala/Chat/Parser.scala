@@ -1,5 +1,8 @@
 package Chat
 
+import Chat.ExprTree.{Balance, Hungry, Pseudo, Thirsty}
+import Chat.Token.{AFFAME, ASSOIFFE, CONNAITRE, ETRE, ME, PSEUDO, SOLDE, VOULOIR}
+
 class UnexpectedTokenException(msg: String) extends Exception(msg){}
 
 // TODO - step 4
@@ -33,24 +36,90 @@ class Parser(tokenized: Tokenized):
   // TODO - Part 2 Step 4
   def parsePhrases() : ExprTree =
     if curToken == BONJOUR then readToken()
-    if curToken == JE then
-      readToken()
-      if curToken == ETRE then
+    this.curToken match {
+      case JE => parseJePhrases()
+      case COMBIEN => {
+        eat(COMBIEN)
+        eat(COUTE)
+        val order = parseOrder()
+        AskPrice(order)
+      }
+      case QUEL => {
+        eat(QUEL)
         eat(ETRE)
-        if curToken == ASSOIFFE then
-          readToken()
-          Thirsty()
-        else if curToken == AFFAME then
-          readToken()
-          Hungry()
-        else if curToken == PSEUDO then
-          val p = curValue.substring(1)
-          readToken()
-          Pseudo(p)
-        else expected(ASSOIFFE, AFFAME, PSEUDO)
-      else if curToken == VOULOIR then
-        eat(VOULOIR)
+        eat(LE)
+        eat(PRIX)
+        eat(DE)
+        val order = parseOrder()
+        AskPrice(order)
+      }
+      case _ => expected(BONJOUR, JE, COMBIEN, QUEL)
+    }
+
+
+//TODO faire des functions qui parse des phrases spécifiques
+  def parseJePhrases() : ExprTree = {
+    eat(JE)
+    this.curToken match {
+      case ETRE => parseEtrePhrases()
+      case VOULOIR => parseVouloirPhrases()
+      case ME => {
+        eat(ME)
+        eat(APPELLE)
+        parsePseudo()
+      }
+      case _ => expected(ETRE, VOULOIR)
+    }
+  }
+
+  def parseEtrePhrases(): ExprTree =
+    eat(ETRE)
+    this.curToken match {
+      case ASSOIFFE => {
+        readToken()
+        Thirsty()
+      }
+      case AFFAME => {
+        readToken()
+        Hungry()
+      }
+      case PSEUDO => parsePseudo()
+      case _ => expected(ASSOIFFE, AFFAME, PSEUDO)
+  }
+
+  def parseVouloirPhrases(): ExprTree =
+    eat(VOULOIR)
+    this.curToken match {
+      case CONNAITRE => {
+        eat(CONNAITRE)
+        eat(ME)
         eat(SOLDE)
         Balance()
-      else expected(ETRE, VOULOIR)
-    else expected(BONJOUR, JE)
+      }
+    case NUM => parseOrder()
+    case _ => expected(CONNAITRE)
+  }
+
+  def parsePseudo(): ExprTree.Pseudo = {
+    val p = curValue.substring(1)
+    readToken()
+    Pseudo(p)
+  }
+
+  def parseOrder(): ExprTree = {
+    val nb = curValue.toInt
+    eat(NUM)
+    val productType = curValue
+    eat(PRODUCT)
+    val brandName = if curToken == MARQUE then curValue else ""
+    if curToken == MARQUE then eat(MARQUE)
+    val order = Order(nb, productType, brandName)
+    this.curToken match {
+      case ET => readToken(); And(order, parseOrder())
+      case OU => readToken(); Or(order, parseOrder())
+      case EOL => order
+      case _ => expected(ET, OU, EOL)
+    }
+  }
+
+

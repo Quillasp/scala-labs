@@ -1,9 +1,13 @@
 package Chat
 import Data.{AccountService, ProductService, Session}
+import Utils.Dictionary.dictionary
 
 class AnalyzerService(productSvc: ProductService,
                       accountSvc: AccountService):
   import ExprTree._
+  import Data.ProductImpl
+
+  def productImpl : ProductImpl = ProductImpl()
   /**
     * Compute the price of the current node, then returns it. If the node is not a computational node, the method
     * returns 0.0.
@@ -11,7 +15,21 @@ class AnalyzerService(productSvc: ProductService,
     * @return the result of the computation
     */
   // TODO - Part 2 Step 3
-  def computePrice(t: ExprTree): Double = ???
+  def computePrice(t: ExprTree): Double = t match {
+    case And(t1, t2) => computePrice(t1) + computePrice(t2)
+    case Or(t1, t2) => math.min(computePrice(t1), computePrice(t2))
+    case Order(nb, productName, brandName) => nb * productImpl.getPrice(productName, brandName)
+    case _ => 0.0
+  }
+
+  def describeOrder(t: ExprTree) : String = t match {
+    case And(t1, t2) => describeOrder(t1) + " et " + describeOrder(t2)
+    case Or(t1, t2) => if computePrice(t1) <= computePrice(t2) then describeOrder(t1) else describeOrder(t2)
+    case Order(nb, productName, brandName) => {
+      val brand = dictionary.getOrElse(brandName, productImpl.getDefaultBrand(productName))
+      if nb > 1 then s"$nb ${productName}s $brand" else s"$nb ${productName} $brand"
+    }
+  }
 
   /**
     * Return the output text of the current node, in order to write it in console.
@@ -35,4 +53,24 @@ class AnalyzerService(productSvc: ProductService,
         val balance:Double = accountSvc.getAccountBalance(currentUser)
         if !balance.isNaN then s"Vous avez ${String.valueOf(balance)} CHF" else "Vous n'avez pas de compte"
       }
+      case Order(_,_,_) | And(_,_) | Or(_,_) => {
+        val currentUser: String = (session.getCurrentUser).getOrElse("")
+        if currentUser.isBlank then "Vous n'avez pas de compte"
+        else {
+          val price = computePrice(t)
+          accountSvc.purchase(currentUser, price)
+          val balance: Double = accountSvc.getAccountBalance(currentUser)
+          if !balance.isNaN then s"Alors ${describeOrder(t)}, cela coûte $price CHF." +
+            s"\nVous avez maintenant ${String.valueOf(balance)} CHF"
+          else "Vous n'avez pas de compte"
+        }
+      }
+      case AskPrice(order) => {
+        val price = computePrice(order)
+        s"Alors ${describeOrder(order)}, cela coûte $price CHF."
+      }
+
 end AnalyzerService
+
+
+//TODO faire des fonctions qui appliques un arbre spécifique
