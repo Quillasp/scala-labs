@@ -22,6 +22,12 @@ class AnalyzerService(productSvc: ProductService,
     case _ => 0.0
   }
 
+  /**
+    * Build the string describing an order
+    * @param t the order to describe
+    * @return a description or the order
+    * @detail if a "OR" is present in the order, only the less expensive one is described
+    */
   def describeOrder(t: ExprTree) : String = t match {
     case And(t1, t2) => describeOrder(t1) + " et " + describeOrder(t2)
     case Or(t1, t2) => if computePrice(t1) <= computePrice(t2) then describeOrder(t1) else describeOrder(t2)
@@ -43,7 +49,7 @@ class AnalyzerService(productSvc: ProductService,
       // Example cases
       case Thirsty() => "Eh bien, la chance est de votre côté, car nous offrons les meilleures bières de la région !"
       case Hungry() => "Pas de soucis, nous pouvons notamment vous offrir des croissants faits maisons !"
-      case Pseudo(name) => {
+      case Identification(name) => {
         session.setCurrentUser(name)
         accountSvc.addAccount(name, 30.0)
         s"Bienvenue à vous, $name"
@@ -67,10 +73,7 @@ class AnalyzerService(productSvc: ProductService,
       }
       case AskPrice(order) => {
         val price = computePrice(order)
-        s"Alors ${describeOrder(order)}, cela coûte $price CHF."
+        s"Alors pour ${describeOrder(order)}, cela coûterait $price CHF."
       }
 
 end AnalyzerService
-
-
-//TODO faire des fonctions qui appliques un arbre spécifique

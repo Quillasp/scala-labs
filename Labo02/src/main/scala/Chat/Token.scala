@@ -4,9 +4,9 @@ enum Token:
   case // Terms
        BONJOUR,
        JE,
-      ME,
-      DE,
-      LE,
+       ME,
+       DE,
+       LE,
        SVP,
        ASSOIFFE,
        AFFAME,
